@@ -24,7 +24,13 @@
 
         <label class="field">
           <span>Senha</span>
-          <input v-model="password" type="password" autocomplete="new-password" required />
+          <input
+            v-model="password"
+            type="password"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          />
         </label>
 
         <button class="submit" :disabled="loading">
