@@ -3,14 +3,11 @@ import { ApiClient } from './ApiClient';
 const api = new ApiClient();
 
 export const PaymentsService = {
-  createPix(orderId: string) {
+  createCheckout(orderId: string) {
     return api.post<{
       id: string;
       status: string;
       transactionId?: string | null;
-      qrCodeUrl?: string | null;
-      qrCode?: string | null;
-      qrCodeBase64?: string | null;
       checkoutUrl?: string | null;
     }>('/payments/checkout', {
       orderId,
