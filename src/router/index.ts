@@ -5,14 +5,14 @@ const routes: RouteRecordRaw[] = [
   { path: '/login', name: 'login', component: () => import('@/pages/Login.vue') },
   { path: '/register', name: 'register', component: () => import('@/pages/Register.vue') },
   {
-    path: '/pagseguro/return',
-    name: 'pagseguro-return',
-    component: () => import('@/pages/PagSeguroReturn.vue'),
+    path: '/mercadopago/return',
+    name: 'mercadopago-return',
+    component: () => import('@/pages/MercadoPagoReturn.vue'),
   },
   {
     path: '/pagamento/retorno',
     name: 'payment-return',
-    component: () => import('@/pages/PagSeguroReturn.vue'),
+    component: () => import('@/pages/MercadoPagoReturn.vue'),
   },
   {
     path: '/orders/:id/preview',

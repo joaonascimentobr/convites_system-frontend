@@ -6,7 +6,9 @@
       <p>{{ statusText }}</p>
       <div v-if="details" class="meta">
         <p><b>Pedido:</b> {{ details.orderId }}</p>
-        <p v-if="details.amount"><b>Valor:</b> R$ {{ (details.amount / 100).toFixed(2) }}</p>
+        <p v-if="details.amountCents">
+          <b>Valor:</b> R$ {{ (details.amountCents / 100).toFixed(2) }}
+        </p>
         <p v-if="details.updatedAt">
           <b>Atualizado:</b> {{ new Date(details.updatedAt).toLocaleString() }}
         </p>
@@ -26,9 +28,12 @@ import { ApiClient } from '@/services/ApiClient';
 const route = useRoute();
 const api = new ApiClient();
 
-const txid = (route.query.transaction_id as string) || (route.query.tid as string) || '';
-const orderId = (route.query.orderId as string) || '';
-const reference = (route.query.reference as string) || '';
+const txid =
+  (route.query.payment_id as string) ||
+  (route.query.transaction_id as string) ||
+  (route.query.tid as string) ||
+  '';
+const orderId = (route.query.order_id as string) || (route.query.orderId as string) || '';
 
 const title = ref('Conferindo pagamento...');
 const statusText = ref('Processando...');
@@ -37,44 +42,47 @@ let timer: number | undefined;
 
 async function poll() {
   try {
-    const params: any = {};
+    const params: Record<string, string> = {};
     if (txid) params.transaction_id = txid;
-    if (orderId) params.orderId = orderId;
-    if (reference) params.reference = reference;
+    if (orderId) params.order_id = orderId;
+
+    if (!Object.keys(params).length) {
+      statusText.value = 'Aguardando os dados do pagamento.';
+      return;
+    }
 
     const data = await api.get<any>('/payments/status', params);
     details.value = data;
 
-    switch (data.status) {
-      case 'PAYMENT_PAID':
+    switch (data?.status) {
+      case 'PAID':
         title.value = 'Pagamento aprovado';
         statusText.value = 'Tudo certo! Seu convite será liberado em instantes.';
         clearTimer();
         break;
-      case 'PAYMENT_PENDING':
+      case 'PENDING':
         title.value = 'Pagamento pendente';
-        statusText.value = 'Ainda aguardando confirmação do PagSeguro.';
+        statusText.value = 'Ainda aguardando confirmação do Mercado Pago.';
         break;
-      case 'PAYMENT_CANCELED':
-        title.value = 'Pagamento cancelado';
+      case 'FAILED':
+        title.value = 'Pagamento não aprovado';
         statusText.value = 'Você pode tentar novamente pelo app.';
         clearTimer();
         break;
-      case 'PAYMENT_AUTHORIZED':
-        title.value = 'Pagamento autorizado';
-        statusText.value = 'Aguardando captura/confirmação final.';
-        break;
       default:
         title.value = 'Status do pagamento';
-        statusText.value = data.status || 'Desconhecido';
+        statusText.value = data?.status || 'Desconhecido';
     }
-  } catch (e) {
+  } catch {
     statusText.value = 'Não foi possível consultar agora.';
   }
 }
 
 function clearTimer() {
-  if (timer) clearInterval(timer);
+  if (timer) {
+    clearInterval(timer);
+    timer = undefined;
+  }
 }
 
 onMounted(() => {

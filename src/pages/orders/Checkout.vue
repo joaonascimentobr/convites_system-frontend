@@ -26,6 +26,19 @@
         <div v-else class="payment-box">
           <p><strong>Transacao:</strong> {{ payment.transactionId || payment.id }}</p>
           <p><strong>Status:</strong> {{ paymentStatus }}</p>
+          <img
+            v-if="payment.qrCodeBase64"
+            class="pix-qr-code"
+            :src="`data:image/png;base64,${payment.qrCodeBase64}`"
+            alt="QR Code PIX"
+          />
+          <p v-if="payment.qrCode" class="pix-code">
+            <strong>Copia e cola PIX:</strong><br />
+            <code>{{ payment.qrCode }}</code>
+          </p>
+          <a v-if="payment.checkoutUrl" :href="payment.checkoutUrl" target="_blank" rel="noopener">
+            Abrir instruções do Mercado Pago
+          </a>
         </div>
 
         <p v-if="error" class="error">{{ error }}</p>
@@ -76,7 +89,14 @@ const apiBase =
   (import.meta.env.DEV ? 'http://localhost:3000' : window.location.origin);
 
 const order = ref<Order | null>(null);
-const payment = ref<{ id: string; status: string; transactionId?: string | null } | null>(null);
+const payment = ref<{
+  id: string;
+  status: string;
+  transactionId?: string | null;
+  qrCode?: string | null;
+  qrCodeBase64?: string | null;
+  checkoutUrl?: string | null;
+} | null>(null);
 const paymentStatus = ref('PENDING');
 const invitePath = ref('');
 const error = ref('');
@@ -279,6 +299,16 @@ onUnmounted(clearTimer);
 
 .payment-box p + p {
   margin-top: 8px;
+}
+
+.pix-qr-code {
+  width: 220px;
+  max-width: 100%;
+  margin: 8px auto 0;
+}
+
+.pix-code {
+  overflow-wrap: anywhere;
 }
 
 .error {

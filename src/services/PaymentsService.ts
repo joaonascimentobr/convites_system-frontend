@@ -9,6 +9,8 @@ export const PaymentsService = {
       status: string;
       transactionId?: string | null;
       qrCodeUrl?: string | null;
+      qrCode?: string | null;
+      qrCodeBase64?: string | null;
       checkoutUrl?: string | null;
     }>('/payments/checkout', {
       orderId,
