@@ -138,7 +138,7 @@ async function createPix() {
   error.value = '';
 
   try {
-    payment.value = await PaymentsService.createPix(orderId, order.value?.amountCents ?? 1990);
+    payment.value = await PaymentsService.createPix(orderId);
     paymentStatus.value = payment.value.status;
     await loadOrder();
     clearTimer();

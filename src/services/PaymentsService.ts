@@ -3,7 +3,7 @@ import { ApiClient } from './ApiClient';
 const api = new ApiClient();
 
 export const PaymentsService = {
-  createPix(orderId: string, amountCents = 1990) {
+  createPix(orderId: string) {
     return api.post<{
       id: string;
       status: string;
@@ -14,7 +14,6 @@ export const PaymentsService = {
       checkoutUrl?: string | null;
     }>('/payments/checkout', {
       orderId,
-      amountCents,
       method: 'PIX',
     });
   },
