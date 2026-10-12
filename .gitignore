@@ -3,4 +3,6 @@ dist/
 .env
 .env.*
 !.env.example
+!.env.development.example
+!.env.production.example
 pnpm-workspace.yaml
